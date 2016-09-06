@@ -1,6 +1,7 @@
 //xico.ino
 #include "Joint/Joint.cpp"
 #include "BodyRelation/BodyRelation.cpp"
+#include "Arduino.h"
 
 #define NUM_TRACKED_JOINTS 4
 #define NUM_RELATIONS 4
