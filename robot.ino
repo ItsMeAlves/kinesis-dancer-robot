@@ -1,15 +1,20 @@
-//xico.ino
+/*
+ * Kinesis Dancer Robot
+ * Main code to receive differentials and integrate movement
+ */
+
+#include <DynamixelSerial.h>
 #include "Joint/Joint.cpp"
 #include "BodyRelation/BodyRelation.cpp"
-#include "Arduino.h"
 
+#define DYNAMIXEL_RATE 1000000
 #define NUM_TRACKED_JOINTS 4
-#define NUM_RELATIONS 4
+#define DYNAMIXEL_CONTROL 9
 #define SERIAL_TIMEOUT 5
+#define NUM_RELATIONS 4
 #define FIELD_SEP ','
 #define LINE_SEP ';'
-
-int led = 13;
+#define LED 13;
 
 Joint* differentials[NUM_TRACKED_JOINTS];
 BodyRelation* bodyRelations[NUM_RELATIONS];
@@ -21,7 +26,9 @@ void cleanDifferentials();
 void setup() {
     Serial.begin(9600);
     Serial.setTimeout(SERIAL_TIMEOUT);
-    pinMode(led, OUTPUT);
+    pinMode(LED, OUTPUT);
+
+    Dynamixel.begin(DYNAMIXEL_RATE, DYNAMIXEL_CONTROL);
 
     for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
         differentials[i] = NULL;
@@ -29,10 +36,10 @@ void setup() {
 }
 
 void loop() {
-    digitalWrite(led, LOW);
+    digitalWrite(LED, LOW);
 
     while(Serial.available() > 0) {
-        digitalWrite(led, HIGH);
+        digitalWrite(LED, HIGH);
         receiveData(Serial.readString(), differentials);
         move(differentials, bodyRelations);
         cleanDifferentials();
@@ -56,7 +63,10 @@ void receiveData(String src, Joint** dest) {
 }
 
 void move(Joint** diffs, BodyRelation** body) {
-    // TODO: write logic
+    for(int i = 0; i < NUM_RELATIONS; i++) {
+        int pin = body[i];
+        Dynamixel.moveSpeed(pin)
+    }
 }
 
 void cleanDifferentials() {
