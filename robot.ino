@@ -14,7 +14,7 @@
 #define NUM_RELATIONS 4
 #define FIELD_SEP ','
 #define LINE_SEP ';'
-#define LED 13;
+#define LED 13
 
 Joint* differentials[NUM_TRACKED_JOINTS];
 BodyRelation* bodyRelations[NUM_RELATIONS];
@@ -64,9 +64,9 @@ void receiveData(String src, Joint** dest) {
 
 void move(Joint** diffs, BodyRelation** body) {
     for(int i = 0; i < NUM_RELATIONS; i++) {
-        Joint* j = searchInDifferentials(body[i].getJointType());
+        Joint* j = searchInDifferentials(body[i]->getJointType());
         if(j != NULL) {
-            int pin = body[i];
+            int pin = body[i]->motor();
             int position = 0; // TODO: make calculations
             int speed = 0; // TODO: make calculations
             Dynamixel.moveSpeed(pin, position, speed);
@@ -85,7 +85,7 @@ Joint* searchInDifferentials(String jointType) {
     Joint* j = NULL;
 
     for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
-        if(jointType.equals(differentials[i].getType())) {
+        if(jointType.equals(differentials[i]->getType())) {
             j = differentials[i];
             break;
         }

@@ -16,7 +16,7 @@ int BodyRelation::motor() {
     return _motorPin;
 };
 
-int* BodyRelation::direction() {
+int BodyRelation::direction() {
     return _direction;
 };
 
