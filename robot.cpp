@@ -13,6 +13,10 @@ int led = 13;
 Joint* differentials[NUM_TRACKED_JOINTS];
 BodyRelation* bodyRelations[NUM_RELATIONS];
 
+void receiveData(String src, Joint** dest);
+void move(Joint** diffs, BodyRelation** body);
+void cleanDifferentials();
+
 void setup() {
     Serial.begin(9600);
     Serial.setTimeout(SERIAL_TIMEOUT);
@@ -49,7 +53,6 @@ void receiveData(String src, Joint** dest) {
         end = src.indexOf(LINE_SEP, begin);
     }
 }
-
 
 void move(Joint** diffs, BodyRelation** body) {
     // TODO: write logic
