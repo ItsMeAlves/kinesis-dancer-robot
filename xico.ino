@@ -40,7 +40,9 @@ void receiveDifferentials(String src, Joint** dest) {
     int end = src.indexOf(LINE_SEP);
 
     while(end != -1) {
-        differentials[i] = objectify(src.substring(begin, end));
+        differentials[i] = Joint::fromString(
+            src.substring(begin, end), 
+            FIELD_SEP);
         Serial.println(differentials[i]->toString());
         i += 1;
         begin = end + 1;
@@ -48,21 +50,6 @@ void receiveDifferentials(String src, Joint** dest) {
     }
 }
 
-Joint* objectify(String src) {
-    String type = src.substring(0, src.indexOf(FIELD_SEP));
-    src = src.substring(src.indexOf(FIELD_SEP) + 1);
-
-    int xIndex = src.indexOf(FIELD_SEP);
-    int yIndex = src.indexOf(FIELD_SEP, xIndex + 1);
-    int zIndex = src.indexOf(FIELD_SEP, yIndex + 1);
-
-    float x = src.substring(0, xIndex).toFloat();
-    float y = src.substring(xIndex + 1, yIndex).toFloat();
-    float z = src.substring(yIndex + 1, zIndex).toFloat();
-
-    Joint* j = new Joint(type, x, y, z);
-    return j;
-}
 
 void move(Joint** diffs, BodyRelation** body) {
     
