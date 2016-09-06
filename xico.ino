@@ -25,25 +25,25 @@ void setup() {
 
 void loop() {
     digitalWrite(led, LOW);
-    
+
     while(Serial.available() > 0) {
         digitalWrite(led, HIGH);
-        receiveDifferentials(Serial.readString(), differentials);
+        receiveData(Serial.readString(), differentials);
+        move(differentials, bodyRelations);
+        cleanDifferentials();
     }
-
-    move(differentials, bodyRelations);
 }
 
-void receiveDifferentials(String src, Joint** dest) {
+void receiveData(String src, Joint** dest) {
     int i = 0;
     int begin = 0;
     int end = src.indexOf(LINE_SEP);
 
     while(end != -1) {
-        differentials[i] = Joint::fromString(
+        dest[i] = Joint::fromString(
             src.substring(begin, end), 
             FIELD_SEP);
-        Serial.println(differentials[i]->toString());
+
         i += 1;
         begin = end + 1;
         end = src.indexOf(LINE_SEP, begin);
@@ -52,5 +52,12 @@ void receiveDifferentials(String src, Joint** dest) {
 
 
 void move(Joint** diffs, BodyRelation** body) {
-    
+    // TODO: write logic
+}
+
+void cleanDifferentials() {
+    for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
+        delete differentials[i];
+        differentials[i] = NULL;
+    }
 }
