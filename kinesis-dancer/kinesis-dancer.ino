@@ -22,7 +22,7 @@ BodyRelation* bodyRelations[NUM_RELATIONS];
 void receiveData(String src, Joint** dest);
 void move(Joint** diffs, BodyRelation** body);
 void cleanDifferentials();
-Cotovelo,10,10,10;Ombro,20,20,20;
+
 void setup() {
     Serial.begin(9600);
     Serial.setTimeout(SERIAL_TIMEOUT);
