@@ -64,8 +64,13 @@ void receiveData(String src, Joint** dest) {
 
 void move(Joint** diffs, BodyRelation** body) {
     for(int i = 0; i < NUM_RELATIONS; i++) {
-        int pin = body[i];
-        Dynamixel.moveSpeed(pin)
+        Joint* j = searchInDifferentials(body[i].getJointType());
+        if(j != NULL) {
+            int pin = body[i];
+            int position = 0; // TODO: make calculations
+            int speed = 0; // TODO: make calculations
+            Dynamixel.moveSpeed(pin, position, speed);
+        }
     }
 }
 
@@ -74,4 +79,17 @@ void cleanDifferentials() {
         delete differentials[i];
         differentials[i] = NULL;
     }
+}
+
+Joint* searchInDifferentials(String jointType) {
+    Joint* j = NULL;
+
+    for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
+        if(jointType.equals(differentials[i].getType())) {
+            j = differentials[i];
+            break;
+        }
+    }
+
+    return j;
 }

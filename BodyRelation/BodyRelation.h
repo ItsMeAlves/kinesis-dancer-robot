@@ -5,14 +5,16 @@
 
 class BodyRelation {
     public:
-        BodyRelation(String j, int pin, int* mapper);
+        BodyRelation(String j, int pin, int direction, float* mapper);
         String getJointType();
         int motor();
-        int* coordinateMapper();
+        int direction();
+        float* mapper();
     private:
         String _jointType;
         int _motorPin;
-        int* _coordinateMapper;
+        int _direction;
+        float* _coordinateMapper;
 };
 
 #endif

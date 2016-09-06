@@ -1,13 +1,10 @@
 #include "Arduino.h"
 #include "BodyRelation.h"
 
-#define X_INDEX 0
-#define Y_INDEX 1
-#define Z_INDEX 2
-
-BodyRelation::BodyRelation(String j, int pin, int* mapper) {
+BodyRelation::BodyRelation(String j, int pin, int direction, float* mapper) {
     _jointType = j;
     _motorPin = pin;
+    _direction = (direction / abs(direction));
     _coordinateMapper = mapper;
 };
 
@@ -19,6 +16,10 @@ int BodyRelation::motor() {
     return _motorPin;
 };
 
-int* BodyRelation::coordinateMapper() {
-    return _coordinateMapper;
+int* BodyRelation::direction() {
+    return _direction;
 };
+
+float* BodyRelation::mapper() {
+    return _coordinateMapper;
+}
