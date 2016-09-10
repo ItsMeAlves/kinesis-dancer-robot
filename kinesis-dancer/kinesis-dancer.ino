@@ -58,9 +58,11 @@ void loop() {
         receiveData(XBEE.readString(), differentials);
 
         //Move robot and then clean data
-        move(differentials, bodyRelations);
+        // move(differentials, bodyRelations);
         cleanDifferentials();
     }
+
+    XBEE.println("OK");
 }
 
 //Function to jointify data received and store it into dest

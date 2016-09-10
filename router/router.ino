@@ -32,5 +32,9 @@ void loop() {
         String source = Serial.readString();
         xbee.println(source);
     }
+
+    //Telling Kinesis that's okay to receive data again!
+    Serial.println("OK");
+
     // That's all, folks!
 }
