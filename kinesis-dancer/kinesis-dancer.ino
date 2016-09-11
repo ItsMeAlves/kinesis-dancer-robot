@@ -4,23 +4,24 @@
  */
 
 //Include files
-#include <DynamixelSerial.h>
+#include <DynamixelSerial1.h>
 #include "../Joint/Joint.cpp"
 #include "../BodyRelation/BodyRelation.cpp"
 
 //Define XBEE serial interface
-#define XBEE Serial
+#define XBEE Serial3
+#define XBEE_RATE 57600
 
 //Define array sizes
 #define NUM_TRACKED_JOINTS 4
 #define NUM_RELATIONS 4
 
 //Define Dynamixel data
-#define DYNAMIXEL_RATE 1000000
+#define DYNAMIXEL_RATE 1000000 
 #define DYNAMIXEL_CONTROL 9
 
 //Define String usage constants
-#define SERIAL_TIMEOUT 4
+#define SERIAL_TIMEOUT 3
 #define FIELD_SEP ','
 #define LINE_SEP ';'
 
@@ -30,12 +31,14 @@
 //Create body control arrays
 Joint* differentials[NUM_TRACKED_JOINTS];
 BodyRelation* bodyRelations[NUM_RELATIONS];
+bool readyToMove = false;
 
 void setup() {
     //Start communication with XBEE module
-    XBEE.begin(9600);
+    XBEE.begin(XBEE_RATE);
     XBEE.setTimeout(SERIAL_TIMEOUT);
     pinMode(LED, OUTPUT);
+    pinMode(12, OUTPUT);
 
     //Start Dynamixel control usage
     Dynamixel.begin(DYNAMIXEL_RATE, DYNAMIXEL_CONTROL);
@@ -44,25 +47,41 @@ void setup() {
     for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
         differentials[i] = NULL;
     }
+    //Initialize bodyRelations array
+    for(int i = 0; i < NUM_RELATIONS; i++) {
+        bodyRelations[i] = NULL;
+    }
+
+    //Sample body relations added for testing purposes
+    float mapper[3] = {0,5,0};
+    float mapper2[3] = {0,2,0};
+    bodyRelations[0] = new BodyRelation("ElbowRight", 10, 1, mapper);
+    bodyRelations[1] = new BodyRelation("WristRight", 13, 1, mapper2);
 }
 
 //Main loop
 void loop() {
     digitalWrite(LED, LOW);
+    //Whenever it has data available, it executes some tasks    
+    if(readyToMove) {
+        //Move robot and then clean data
+        move();
+        cleanDifferentials();
+        // Then, wait more data to move again
+        readyToMove = false;
+    }
+}
 
-    //Whenever it has data available, it executes some tasks
+// Whenever data comes into Serial3 interface, it gets fired
+void serialEvent3() {
+    digitalWrite(LED, HIGH);
+
+    // So it reads all data available and signs movement readiness
     while(XBEE.available() > 0) {
-        digitalWrite(LED, HIGH);
-
         //Receive differentials data from Serial interface
         receiveData(XBEE.readString(), differentials);
-
-        //Move robot and then clean data
-        // move(differentials, bodyRelations);
-        cleanDifferentials();
+        readyToMove = true;
     }
-
-    XBEE.println("OK");
 }
 
 //Function to jointify data received and store it into dest
@@ -84,36 +103,48 @@ void receiveData(String src, Joint** dest) {
 }
 
 //Function to move using body relations data
-void move(Joint** diffs, BodyRelation** body) {
+void move() {
     for(int i = 0; i < NUM_RELATIONS; i++) {
-        Joint* j = searchInDifferentials(body[i]->getJointType());
-        if(j != NULL) {
-            int pin = body[i]->motor();
-            int position = 0; // TODO: make calculations
-            int speed = 0; // TODO: make calculations
-            Dynamixel.moveSpeed(pin, position, speed);
+        if(bodyRelations[i] == NULL)
+            continue;
+
+        int index = searchInDifferentials(bodyRelations[i]->jointType());
+        
+        if(index != -1) {
+            analogWrite(12, 100);
+            int id = bodyRelations[i]->motor();
+            //Sample position calculation, for testing purposes
+            int position = 512 + (400 * differentials[i]->y());  
+            Dynamixel.move(id, position);
         }
     }
+    digitalWrite(12, LOW);
 }
 
 //Function to clean unused joints
 void cleanDifferentials() {
     for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
+        if(differentials[i] == NULL)
+            continue;
+
         delete differentials[i];
         differentials[i] = NULL;
     }
 }
 
 //Search a joint in differentials array by its type
-Joint* searchInDifferentials(String jointType) {
-    Joint* j = NULL;
+int searchInDifferentials(String jointType) {
+    int index = -1;
 
     for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
+        if(differentials[i] == NULL)
+            continue;
+
         if(jointType.equals(differentials[i]->getType())) {
-            j = differentials[i];
+            index = i;
             break;
         }
     }
 
-    return j;
+    return index;
 }

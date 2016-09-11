@@ -1,10 +1,10 @@
 #include "Arduino.h"
 #include "BodyRelation.h"
 
-BodyRelation::BodyRelation(String j, int pin, int direction, float* mapper) {
+BodyRelation::BodyRelation(String j, int id, int direction, float* mapper) {
     int i = X_INDEX;
     _jointType = j;
-    _motorPin = pin;
+    _motorId = id;
     _coordinateMapper = mapper;
     if(direction != 0) {
         _direction = (direction / abs(direction));
@@ -14,12 +14,12 @@ BodyRelation::BodyRelation(String j, int pin, int direction, float* mapper) {
     }
 };
 
-String BodyRelation::getJointType() {
+String BodyRelation::jointType() {
     return _jointType;
 };
 
 int BodyRelation::motor() {
-    return _motorPin;
+    return _motorId;
 };
 
 int BodyRelation::direction() {

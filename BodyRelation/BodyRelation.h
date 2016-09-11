@@ -9,14 +9,14 @@
 
 class BodyRelation {
     public:
-        BodyRelation(String j, int pin, int direction, float* mapper);
-        String getJointType();
+        BodyRelation(String j, int id, int direction, float* mapper);
+        String jointType();
         int motor();
         int direction();
         float* mapper();
     private:
         String _jointType;
-        int _motorPin;
+        int _motorId;
         int _direction;
         float* _coordinateMapper;
 };
