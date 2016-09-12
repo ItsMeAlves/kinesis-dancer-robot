@@ -9,17 +9,17 @@
 
 class BodyRelation {
     public:
-        BodyRelation(String j, int id, int direction, float* mapper);
+        BodyRelation(String j, int id, int direction, float* multiplier);
         String jointType();
         int motor();
         int direction();
-        float* mapper();
+        float* multiplier();
         String toString();
     private:
         String _jointType;
         int _motorId;
         int _direction;
-        float* _coordinateMapper;
+        float* _multiplier;
 };
 
 #endif

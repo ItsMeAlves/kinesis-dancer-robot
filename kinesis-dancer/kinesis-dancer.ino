@@ -24,6 +24,7 @@
 #define ON 1
 #define LEFT 0
 #define RIGHT 1
+#define MOVEMENT_MULTIPLIER 200
 
 //Define String usage constants
 #define SERIAL_TIMEOUT 3
@@ -116,13 +117,19 @@ void move() {
         int index = searchInDifferentials(bodyRelations[i]->jointType());
         
         if(index != -1) {
-            analogWrite(12, 100);
+            analogWrite(12, 100);   // LED used during testing 
             BodyRelation* relation = bodyRelations[i];
-            //Sample position calculation, for testing purposes
+            
             int id = relation->motor();
-            int y = differentials[i]->y();
             int direction = relation->direction();
-            int speed = 500 * y;  
+            float* multiplier = relation->multiplier();
+            
+            int x = differentials[i]->x() * multiplier[X_INDEX];
+            int y = differentials[i]->y() * multiplier[Y_INDEX];
+            int z = differentials[i]->z() * multiplier[Z_INDEX];
+            
+            //Sample speed calculation, for testing purposes
+            int speed = MOVEMENT_MULTIPLIER * (x + y + z);  
 
             Dynamixel.turn(id, direction, speed);
         }
