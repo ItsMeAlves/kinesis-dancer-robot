@@ -57,6 +57,11 @@ void setup() {
     
     //Sample body relations added for testing purposes
     provideBodyRelationsTo(bodyRelations);
+
+    for(int i = 0; i < NUM_RELATIONS; i++) {
+        int id = bodyRelations[i]->motor();
+        Dynamixel.setEndless(id, ON);
+    }
 }
 
 //Main loop
