@@ -11,6 +11,7 @@
 //Define XBEE serial interface
 #define XBEE Serial3
 #define XBEE_RATE 57600
+#define XBEE_EVENT serialEvent3
 
 //Define array sizes
 #define NUM_TRACKED_JOINTS 4
@@ -19,6 +20,10 @@
 //Define Dynamixel data
 #define DYNAMIXEL_RATE 1000000 
 #define DYNAMIXEL_CONTROL 9
+#define OFF 0
+#define ON 1
+#define LEFT 0
+#define RIGHT 1
 
 //Define String usage constants
 #define SERIAL_TIMEOUT 3
@@ -55,8 +60,8 @@ void setup() {
     //Sample body relations added for testing purposes
     float mapper[3] = {0,5,0};
     float mapper2[3] = {0,2,0};
-    bodyRelations[0] = new BodyRelation("ElbowRight", 10, 1, mapper);
-    bodyRelations[1] = new BodyRelation("WristRight", 13, 1, mapper2);
+    bodyRelations[0] = new BodyRelation("ElbowRight", 10, RIGHT, mapper);
+    bodyRelations[1] = new BodyRelation("WristRight", 13, RIGHT, mapper2);
 }
 
 //Main loop
@@ -73,7 +78,7 @@ void loop() {
 }
 
 // Whenever data comes into Serial3 interface, it gets fired
-void serialEvent3() {
+void XBEE_EVENT() {
     digitalWrite(LED, HIGH);
 
     // So it reads all data available and signs movement readiness
@@ -112,10 +117,14 @@ void move() {
         
         if(index != -1) {
             analogWrite(12, 100);
-            int id = bodyRelations[i]->motor();
+            BodyRelation* relation = bodyRelations[i];
             //Sample position calculation, for testing purposes
-            int position = 512 + (400 * differentials[i]->y());  
-            Dynamixel.move(id, position);
+            int id = relation->motor();
+            int y = differentials[i]->y();
+            int direction = relation->direction();
+            int speed = 500 * y;  
+
+            Dynamixel.turn(id, direction, speed);
         }
     }
     digitalWrite(12, LOW);
