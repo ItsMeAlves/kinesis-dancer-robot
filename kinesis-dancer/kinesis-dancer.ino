@@ -36,6 +36,8 @@
 //Create body control arrays
 Joint* differentials[NUM_TRACKED_JOINTS];
 BodyRelation* bodyRelations[NUM_RELATIONS];
+
+// Set global variables
 bool readyToMove = false;
 
 void setup() {
@@ -52,16 +54,9 @@ void setup() {
     for(int i = 0; i < NUM_TRACKED_JOINTS; i++) {
         differentials[i] = NULL;
     }
-    //Initialize bodyRelations array
-    for(int i = 0; i < NUM_RELATIONS; i++) {
-        bodyRelations[i] = NULL;
-    }
-
+    
     //Sample body relations added for testing purposes
-    float mapper[3] = {0,5,0};
-    float mapper2[3] = {0,2,0};
-    bodyRelations[0] = new BodyRelation("ElbowRight", 10, RIGHT, mapper);
-    bodyRelations[1] = new BodyRelation("WristRight", 13, RIGHT, mapper2);
+    provideBodyRelationsTo(bodyRelations);
 }
 
 //Main loop

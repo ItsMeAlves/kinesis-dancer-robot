@@ -14,6 +14,7 @@ class BodyRelation {
         int motor();
         int direction();
         float* mapper();
+        String toString();
     private:
         String _jointType;
         int _motorId;

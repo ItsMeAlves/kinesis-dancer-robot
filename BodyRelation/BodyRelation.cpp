@@ -29,3 +29,7 @@ int BodyRelation::direction() {
 float* BodyRelation::mapper() {
     return _coordinateMapper;
 }
+
+String BodyRelation::toString() {
+    return _jointType + " " + _motorId + " " + _direction;
+}
