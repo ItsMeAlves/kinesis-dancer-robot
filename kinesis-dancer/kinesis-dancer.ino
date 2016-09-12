@@ -20,11 +20,8 @@
 //Define Dynamixel data
 #define DYNAMIXEL_RATE 1000000 
 #define DYNAMIXEL_CONTROL 9
-#define OFF 0
-#define ON 1
-#define LEFT 0
-#define RIGHT 1
 #define MOVEMENT_MULTIPLIER 200
+#define RIGHT RIGTH  //Fix library typo
 
 //Define String usage constants
 #define SERIAL_TIMEOUT 3
