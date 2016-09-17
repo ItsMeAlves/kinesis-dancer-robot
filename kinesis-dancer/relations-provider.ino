@@ -4,9 +4,6 @@ void provideBodyRelationsTo(BodyRelation** arr) {
         arr[i] = NULL;
     }
 
-    float multiplier0[3] = {0,1,0};
-    arr[0] = new BodyRelation("ElbowRight", 10, LEFT, multiplier0);
-
-    float multiplier1[3] = {0,1,0};
-    arr[1] = new BodyRelation("WristRight", 13, LEFT, multiplier1);
+    arr[0] = new BodyRelation("ElbowRight", 10, LEFT, 0, 1, 0);
+    arr[1] = new BodyRelation("WristRight", 13, LEFT, 0, 1, 0);
 }

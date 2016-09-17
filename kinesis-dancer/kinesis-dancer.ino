@@ -8,10 +8,10 @@
 #include "../Joint/Joint.cpp"
 #include "../BodyRelation/BodyRelation.cpp"
 
-//Define XBEE serial interface
-#define XBEE Serial3
-#define XBEE_RATE 57600
-#define XBEE_EVENT serialEvent3
+//Define standard serial interface
+#define SERIAL Serial
+#define SERIAL_RATE 57600
+#define SERIAL_EVENT serialEvent
 
 //Define array sizes
 #define NUM_TRACKED_JOINTS 4
@@ -20,7 +20,7 @@
 //Define Dynamixel data
 #define DYNAMIXEL_RATE 1000000 
 #define DYNAMIXEL_CONTROL 9
-#define MOVEMENT_MULTIPLIER 200
+#define MOVEMENT_MULTIPLIER 100
 #define RIGHT RIGTH  //Fix library typo
 
 //Define String usage constants
@@ -39,9 +39,10 @@ BodyRelation* bodyRelations[NUM_RELATIONS];
 bool readyToMove = false;
 
 void setup() {
-    //Start communication with XBEE module
-    XBEE.begin(XBEE_RATE);
-    XBEE.setTimeout(SERIAL_TIMEOUT);
+    //Start communication with SERIAL module
+    SERIAL.begin(SERIAL_RATE);
+    SERIAL.setTimeout(SERIAL_TIMEOUT);
+    Serial.begin(9600);
     pinMode(LED, OUTPUT);
     pinMode(12, OUTPUT);
 
@@ -58,7 +59,8 @@ void setup() {
 
     for(int i = 0; i < NUM_RELATIONS; i++) {
         int id = bodyRelations[i]->motor();
-        Dynamixel.setEndless(id, ON);
+        Dynamixel.setEndless(id, OFF);
+        Dynamixel.ledStatus(id, ON);
     }
 }
 
@@ -76,13 +78,13 @@ void loop() {
 }
 
 // Whenever data comes into Serial3 interface, it gets fired
-void XBEE_EVENT() {
+void SERIAL_EVENT() {
     digitalWrite(LED, HIGH);
 
     // So it reads all data available and signs movement readiness
-    while(XBEE.available() > 0) {
+    while(SERIAL.available() > 0) {
         //Receive differentials data from Serial interface
-        receiveData(XBEE.readString(), differentials);
+        receiveData(SERIAL.readString(), differentials);
         readyToMove = true;
     }
 }
@@ -119,19 +121,25 @@ void move() {
             
             int id = relation->motor();
             int direction = relation->direction();
-            float* multiplier = relation->multiplier();
             
-            int x = differentials[i]->x() * multiplier[X_INDEX];
-            int y = differentials[i]->y() * multiplier[Y_INDEX];
-            int z = differentials[i]->z() * multiplier[Z_INDEX];
+            float x = differentials[i]->x() * relation->xMultiplier();
+            float y = differentials[i]->y() * relation->yMultiplier();
+            float z = differentials[i]->z() * relation->zMultiplier();
             
             //Sample speed calculation, for testing purposes
             int speed = MOVEMENT_MULTIPLIER * (x + y + z);  
 
+            if(speed < 0) {
+                if(direction == LEFT)
+                    direction = RIGHT;
+                else
+                    direction = LEFT;
+            }
+
             Dynamixel.turn(id, direction, speed);
+            digitalWrite(12, LOW);
         }
     }
-    digitalWrite(12, LOW);
 }
 
 //Function to clean unused joints
