@@ -10,7 +10,7 @@
 
 //Define standard serial interface
 #define SERIAL Serial
-#define SERIAL_RATE 57600
+#define SERIAL_RATE 115200
 #define SERIAL_EVENT serialEvent
 
 //Define array sizes
@@ -19,8 +19,8 @@
 
 //Define Dynamixel data
 #define DYNAMIXEL_RATE 1000000 
-#define DYNAMIXEL_CONTROL 9
-#define MOVEMENT_MULTIPLIER 100
+#define DYNAMIXEL_CONTROL 2
+#define MOVEMENT_MULTIPLIER 250
 #define RIGHT RIGTH  //Fix library typo
 
 //Define String usage constants
@@ -42,7 +42,6 @@ void setup() {
     //Start communication with SERIAL module
     SERIAL.begin(SERIAL_RATE);
     SERIAL.setTimeout(SERIAL_TIMEOUT);
-    Serial.begin(9600);
     pinMode(LED, OUTPUT);
     pinMode(12, OUTPUT);
 
@@ -61,6 +60,7 @@ void setup() {
         int id = bodyRelations[i]->motor();
         Dynamixel.setEndless(id, OFF);
         Dynamixel.ledStatus(id, ON);
+        Dynamixel.move(id, 512);
     }
 }
 
@@ -74,10 +74,11 @@ void loop() {
         cleanDifferentials();
         // Then, wait more data to move again
         readyToMove = false;
+        SERIAL.println("OK");
     }
 }
 
-// Whenever data comes into Serial3 interface, it gets fired
+// Whenever data comes into Serial interface, it gets fired
 void SERIAL_EVENT() {
     digitalWrite(LED, HIGH);
 
@@ -116,7 +117,6 @@ void move() {
         int index = searchInDifferentials(bodyRelations[i]->jointType());
         
         if(index != -1) {
-            analogWrite(12, 100);   // LED used during testing 
             BodyRelation* relation = bodyRelations[i];
             
             int id = relation->motor();
@@ -126,18 +126,9 @@ void move() {
             float y = differentials[i]->y() * relation->yMultiplier();
             float z = differentials[i]->z() * relation->zMultiplier();
             
-            //Sample speed calculation, for testing purposes
-            int speed = MOVEMENT_MULTIPLIER * (x + y + z);  
-
-            if(speed < 0) {
-                if(direction == LEFT)
-                    direction = RIGHT;
-                else
-                    direction = LEFT;
-            }
-
-            Dynamixel.turn(id, direction, speed);
-            digitalWrite(12, LOW);
+            float speed = MOVEMENT_MULTIPLIER * (x + y + z);
+            //int signal = speed / abs(speed);
+            Dynamixel.move(id, 512 + speed);
         }
     }
 }

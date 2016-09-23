@@ -4,6 +4,6 @@ void provideBodyRelationsTo(BodyRelation** arr) {
         arr[i] = NULL;
     }
 
-    arr[0] = new BodyRelation("ElbowRight", 10, LEFT, 0, 1, 0);
+    arr[0] = new BodyRelation("ElbowRight", 10, LEFT, 0, 2, 0);
     arr[1] = new BodyRelation("WristRight", 13, LEFT, 0, 1, 0);
 }
