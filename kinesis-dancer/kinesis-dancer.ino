@@ -122,9 +122,9 @@ void move() {
             int id = relation->motor();
             int direction = relation->direction();
             
-            float x = differentials[i]->x() * relation->xMultiplier();
-            float y = differentials[i]->y() * relation->yMultiplier();
-            float z = differentials[i]->z() * relation->zMultiplier();
+            float x = differentials[index]->x() * relation->xMultiplier();
+            float y = differentials[index]->y() * relation->yMultiplier();
+            float z = differentials[index]->z() * relation->zMultiplier();
             
             float speed = MOVEMENT_MULTIPLIER * (x + y + z);
             //int signal = speed / abs(speed);
