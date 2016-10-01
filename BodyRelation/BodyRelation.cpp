@@ -1,10 +1,10 @@
 #include "Arduino.h"
 #include "BodyRelation.h"
 
-BodyRelation::BodyRelation(String j, int id, int direction, float xMultiplier, float yMultiplier, float zMultiplier) {
+BodyRelation::BodyRelation(String j, int id, int offset, float xMultiplier, float yMultiplier, float zMultiplier) {
     _jointType = j;
     _motorId = id;
-    _direction = direction;
+    _offset = offset;
     _xMultiplier = xMultiplier;
     _yMultiplier = yMultiplier;
     _zMultiplier = zMultiplier;
@@ -18,8 +18,8 @@ int BodyRelation::motor() {
     return _motorId;
 };
 
-int BodyRelation::direction() {
-    return _direction;
+int BodyRelation::offset() {
+    return _offset;
 };
 
 float BodyRelation::xMultiplier() {
@@ -33,5 +33,5 @@ float BodyRelation::zMultiplier() {
 }
 
 String BodyRelation::toString() {
-    return _jointType + " " + _motorId + " " + _direction;
+    return _jointType + " " + _motorId + " " + _offset;
 }

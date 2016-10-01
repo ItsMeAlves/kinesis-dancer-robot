@@ -9,10 +9,10 @@
 
 class BodyRelation {
     public:
-        BodyRelation(String j, int id, int direction, float xMultiplier, float yMultiplier, float zMultiplier);
+        BodyRelation(String j, int id, int offset, float xMultiplier, float yMultiplier, float zMultiplier);
         String jointType();
         int motor();
-        int direction();
+        int offset();
         float xMultiplier();
         float yMultiplier();
         float zMultiplier();
@@ -20,7 +20,7 @@ class BodyRelation {
     private:
         String _jointType;
         int _motorId;
-        int _direction;
+        int _offset;
         float _xMultiplier;
         float _yMultiplier;
         float _zMultiplier;

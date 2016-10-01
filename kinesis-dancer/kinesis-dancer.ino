@@ -55,13 +55,9 @@ void setup() {
     
     //Sample body relations added for testing purposes
     provideBodyRelationsTo(bodyRelations);
+    moveToDefaultPosition();
 
-    for(int i = 0; i < NUM_RELATIONS; i++) {
-        int id = bodyRelations[i]->motor();
-        Dynamixel.setEndless(id, OFF);
-        Dynamixel.ledStatus(id, ON);
-        Dynamixel.move(id, 512);
-    }
+    SERIAL.println("OK");
 }
 
 //Main loop
@@ -87,6 +83,20 @@ void SERIAL_EVENT() {
         //Receive differentials data from Serial interface
         receiveData(SERIAL.readString(), differentials);
         readyToMove = true;
+    }
+}
+
+//Function to move to default position, made by relations offsets
+void moveToDefaultPosition() {
+    for(int i = 0; i < NUM_RELATIONS; i++) {
+        if(bodyRelations[i] == NULL)
+            continue;
+
+        int id = bodyRelations[i]->motor();
+        int pos = bodyRelations[i]->offset();
+        Dynamixel.ledStatus(id, ON);
+
+        Dynamixel.move(id, pos);
     }
 }
 
@@ -120,17 +130,21 @@ void move() {
             BodyRelation* relation = bodyRelations[i];
             
             int id = relation->motor();
-            int direction = relation->direction();
-            
-            float x = differentials[index]->x() * relation->xMultiplier();
-            float y = differentials[index]->y() * relation->yMultiplier();
-            float z = differentials[index]->z() * relation->zMultiplier();
-            
-            float speed = MOVEMENT_MULTIPLIER * (x + y + z);
-            //int signal = speed / abs(speed);
-            Dynamixel.move(id, 512 + speed);
+            int pos = calculatePosition(differentials[index], relation);
+
+            Dynamixel.move(id, pos);
         }
     }
+}
+
+int calculatePosition(Joint* j, BodyRelation* r) {
+    float x = j->x() * r->xMultiplier();
+    float y = j->y() * r->yMultiplier();
+    float z = j->z() * r->zMultiplier();
+    int offset = r->offset();
+    float speed = MOVEMENT_MULTIPLIER * (x + y + z);
+
+    return offset + speed;
 }
 
 //Function to clean unused joints
