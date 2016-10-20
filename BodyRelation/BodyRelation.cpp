@@ -1,13 +1,15 @@
 #include "Arduino.h"
 #include "BodyRelation.h"
 
-BodyRelation::BodyRelation(String j, int id, int offset, float xMultiplier, float yMultiplier, float zMultiplier) {
+BodyRelation::BodyRelation(String j, int id, int offset, 
+    float xMultiplier, float yMultiplier, float zMultiplier, String enemy) {
     _jointType = j;
     _motorId = id;
     _offset = offset;
     _xMultiplier = xMultiplier;
     _yMultiplier = yMultiplier;
     _zMultiplier = zMultiplier;
+    _enemy = enemy;
 };
 
 String BodyRelation::jointType() {
@@ -21,6 +23,14 @@ int BodyRelation::motor() {
 int BodyRelation::offset() {
     return _offset;
 };
+
+String BodyRelation::enemy() {
+    return _enemy;
+}
+
+bool BodyRelation::hasAnEnemy() {
+    return !_enemy.equals("*");
+}
 
 float BodyRelation::xMultiplier() {
     return _xMultiplier;

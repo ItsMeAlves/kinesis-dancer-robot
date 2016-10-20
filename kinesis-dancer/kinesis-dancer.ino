@@ -14,8 +14,8 @@
 #define SERIAL_EVENT serialEvent
 
 //Define array sizes
-#define NUM_TRACKED_JOINTS 4
-#define NUM_RELATIONS 4
+#define NUM_TRACKED_JOINTS 6
+#define NUM_RELATIONS 7
 
 //Define Dynamixel data
 #define DYNAMIXEL_RATE 1000000 
@@ -56,8 +56,6 @@ void setup() {
     //Sample body relations added for testing purposes
     provideBodyRelationsTo(bodyRelations);
     moveToDefaultPosition();
-
-    SERIAL.println("OK");
 }
 
 //Main loop
@@ -81,8 +79,16 @@ void SERIAL_EVENT() {
     // So it reads all data available and signs movement readiness
     while(SERIAL.available() > 0) {
         //Receive differentials data from Serial interface
-        receiveData(SERIAL.readString(), differentials);
-        readyToMove = true;
+        String src = SERIAL.readString();
+
+        if(src.equals("RESTART")) {
+            moveToDefaultPosition();
+            SERIAL.println("OK");
+        }
+        else {
+            receiveData(src, differentials);
+            readyToMove = true;
+        }
     }
 }
 
@@ -94,6 +100,7 @@ void moveToDefaultPosition() {
 
         int id = bodyRelations[i]->motor();
         int pos = bodyRelations[i]->offset();
+        Dynamixel.setEndless(id, OFF);
         Dynamixel.ledStatus(id, ON);
 
         Dynamixel.move(id, pos);
@@ -125,24 +132,46 @@ void move() {
             continue;
 
         int index = searchInDifferentials(bodyRelations[i]->jointType());
+        int indexEnemy = -1;
+
+        if(bodyRelations[i]->hasAnEnemy()) {
+            indexEnemy = searchInDifferentials(bodyRelations[i]->enemy());
+        }
         
         if(index != -1) {
             BodyRelation* relation = bodyRelations[i];
-            
+            Joint* enemy = NULL;
+
+            if(indexEnemy != -1) {
+                enemy = differentials[indexEnemy];
+            }
+
             int id = relation->motor();
-            int pos = calculatePosition(differentials[index], relation);
+            int pos = calculatePosition(differentials[index], enemy, relation);
 
             Dynamixel.move(id, pos);
         }
     }
 }
 
-int calculatePosition(Joint* j, BodyRelation* r) {
+int calculatePosition(Joint* j, Joint* e, BodyRelation* r) {
     float x = j->x() * r->xMultiplier();
     float y = j->y() * r->yMultiplier();
     float z = j->z() * r->zMultiplier();
+
+    float xEnemy = 0;
+    float yEnemy = 0;
+    float zEnemy = 0;
+
+    if(e != NULL) {
+        xEnemy = e->x() * r->xMultiplier();
+        yEnemy = e->y() * r->yMultiplier();
+        zEnemy = e->z() * r->zMultiplier();
+    }
+
     int offset = r->offset();
-    float speed = MOVEMENT_MULTIPLIER * (x + y + z);
+    float speed = MOVEMENT_MULTIPLIER * 
+        ((x - xEnemy) + (y - yEnemy) + (z - zEnemy));
 
     return offset + speed;
 }
